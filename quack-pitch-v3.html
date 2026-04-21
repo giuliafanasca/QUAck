@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUAck</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,300&family=Bebas+Neue&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080808;
+  --fg: #E8E4DC;
+  --yellow: #F5E642;
+  --red: #E83A2A;
+  --dim: #141414;
+  --border: #222;
+  --mid: #555;
+}
+
+html { font-size: 16px; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'IBM Plex Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* SCANLINE EFFECT */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.08) 2px,
+    rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 999;
+}
+
+.wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 3rem 0 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.tag {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mid);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.6rem;
+}
+
+.tag.live {
+  color: var(--yellow);
+  border-color: var(--yellow);
+  animation: blink 2s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.wordmark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(6rem, 18vw, 13rem);
+  line-height: 0.85;
+  letter-spacing: 0.02em;
+  color: var(--fg);
+  display: block;
+  margin-bottom: -0.1em;
+}
+
+.wordmark .ck { color: var(--red); }
+
+.hero-sub {
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: var(--mid);
+  max-width: 500px;
+  padding: 1.5rem 0 2rem;
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+}
+
+/* ── LEDE ── */
+.lede {
+  padding: 4rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.lede-text {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.8rem, 4.5vw, 3.2rem);
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+}
+
+.lede-text .hl { color: var(--yellow); }
+
+/* ── GRID ── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.grid-2 > * {
+  padding: 3rem 2rem 3rem 0;
+  border-right: 1px solid var(--border);
+}
+
+.grid-2 > *:last-child {
+  border-right: none;
+  padding-left: 2rem;
+  padding-right: 0;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.grid-3 > * {
+  padding: 2.5rem 1.5rem 2.5rem 0;
+  border-right: 1px solid var(--border);
+}
+
+.grid-3 > *:last-child {
+  border-right: none;
+  padding-left: 1.5rem;
+  padding-right: 0;
+}
+
+/* ── TYPE ── */
+.label {
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.heading {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.body {
+  font-size: 0.74rem;
+  line-height: 1.9;
+  color: #888;
+}
+
+.body strong { color: var(--fg); font-weight: 400; }
+.body em { font-style: normal; color: var(--yellow); }
+
+/* ── TERMINAL BOX ── */
+.terminal {
+  background: #0D0D0D;
+  border: 1px solid var(--border);
+  font-size: 0.7rem;
+  overflow: hidden;
+}
+
+.terminal-bar {
+  background: var(--border);
+  padding: 0.4rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #333; }
+.dot.r { background: var(--red); }
+.dot.y { background: var(--yellow); }
+.dot.g { background: #3A8A3A; }
+
+.terminal-filename {
+  margin-left: auto;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  color: var(--mid);
+}
+
+.terminal-body {
+  padding: 1.2rem;
+}
+
+.t-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #111;
+  align-items: start;
+}
+
+.t-row:last-child { border-bottom: none; }
+
+.t-key { color: var(--yellow); }
+.t-val { color: #666; font-style: italic; }
+
+/* ── STEPS ── */
+.steps {
+  border-bottom: 1px solid var(--border);
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  border-bottom: 1px solid var(--border);
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-n {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  color: var(--border);
+  padding: 1.5rem 0 1.5rem 0;
+  line-height: 1;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.step-body {
+  padding: 1.5rem 0 1.5rem 2rem;
+}
+
+.step-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--fg);
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+}
+
+.step-desc {
+  font-size: 0.72rem;
+  line-height: 1.8;
+  color: #666;
+}
+
+.step-desc em { font-style: normal; color: var(--yellow); }
+
+/* ── ANALOGY ── */
+.analogy {
+  border-bottom: 1px solid var(--border);
+}
+
+.analogy-head {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ah-cell {
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+
+.ah-cell:last-child { padding-left: 1rem; }
+
+.a-row {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  align-items: center;
+  border-bottom: 1px solid #111;
+  padding: 0.8rem 0;
+}
+
+.a-row:last-child { border-bottom: none; }
+
+.a-old {
+  font-size: 0.74rem;
+  color: var(--mid);
+  text-decoration: line-through;
+}
+
+.a-arr {
+  color: var(--red);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.a-new {
+  font-size: 0.74rem;
+  color: var(--fg);
+  padding-left: 1rem;
+}
+
+/* ── FOOTER ── */
+footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0;
+}
+
+.f-left {
+  font-size: 0.65rem;
+  color: var(--mid);
+  line-height: 1.8;
+}
+
+.f-right {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  color: var(--border);
+  letter-spacing: 0.05em;
+}
+
+/* ── SECTION WRAPPER ── */
+.section {
+  border-bottom: 1px solid var(--border);
+  padding: 3rem 0;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.wordmark { animation: fadeUp 0.5s ease both; }
+.lede { animation: fadeUp 0.5s 0.1s ease both; }
+
+@media (max-width: 640px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .grid-2 > *, .grid-3 > * {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 0;
+  }
+  .grid-2 > *:last-child, .grid-3 > *:last-child {
+    padding-left: 0;
+    border-bottom: none;
+  }
+  footer { flex-direction: column; align-items: flex-start; gap: 1rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-top">
+      <span class="tag">Spatial Web Infrastructure</span>
+      <span class="tag live">▸ AWE Builders 2025</span>
+    </div>
+    <span class="wordmark">QUA<span class="ck">ck</span></span>
+    <p class="hero-sub">
+      An open protocol for context-aware spatial navigation — where physical spaces self-declare their digital layer, and a persistent AR duck 🦆 delivers it hands-free, in conversation, in costume.
+    </p>
+  </section>
+
+  <!-- LEDE -->
+  <section class="lede">
+    <p class="lede-text">
+      The AI already knows<br>
+      you're at H&M.<br>
+      But <span class="hl">H&M has no say</span><br>
+      in what the AI does<br>inside H&M.
+    </p>
+  </section>
+
+  <!-- PROBLEM + GAP -->
+  <div class="grid-2">
+    <div>
+      <span class="label">// The Problem</span>
+      <h2 class="heading">Location-aware AI is still guessing.</h2>
+      <p class="body">
+        Ambient AI platforms — glasses, spatial computers, wearables — are proliferating fast. They know where you are. But they operate on generic knowledge: training data, public APIs, assumptions.
+        <br><br>
+        <strong>The space itself has no voice.</strong> The AI decides what to surface, when, and why — with zero input from the entity that owns and understands that space.
+        <br><br>
+        And from the user's side: you don't know what you can ask. You don't know what's available. You navigate blind.
+      </p>
+    </div>
+    <div>
+      <span class="label">// The Gap</span>
+      <h2 class="heading">Knowing vs. being told.</h2>
+      <p class="body">
+        There's a fundamental difference between an AI that <em>knows about</em> the Colosseum from training data — and the Colosseum actively <strong>declaring what it wants to offer you, right now, in this context.</strong>
+        <br><br>
+        The first is a search engine pulling from a generic corpus. The second is a curated experience controlled by the entity that owns the space.
+      </p>
+    </div>
+  </div>
+
+  <!-- THE PROPOSAL -->
+  <section class="section">
+    <span class="label">// The Proposal</span>
+    <h2 class="heading" style="font-size:2rem; margin-bottom:2rem;">A behavioral label protocol for physical space. A companion that wears it.</h2>
+
+    <div class="grid-2" style="border:none;">
+      <div style="border-right: 1px solid var(--border); padding: 0 2rem 0 0;">
+        <p class="body">
+          QUAck proposes two interlocked layers:
+          <br><br>
+          <strong>The Protocol.</strong> An open format — like robots.txt or ActivityPub — where any physical location can host its own endpoint. That endpoint is a behavioral label: it declares the space's identity, the capabilities it wants to expose, the constraints it wants to impose, and the tone it wants the AI to adopt. Each location controls its own data.
+          <br><br>
+          <strong>The Companion.</strong> A persistent AR duck — always present in your field of view, always yours. It reads behavioral labels on proximity and surfaces the space's declared capabilities through natural conversation, hands-free. Not a notification. Not an app. And when it enters a new space, it dresses for the occasion.
+          <br><br>
+          <strong>Technically:</strong> QUAck endpoints are lightweight JSON APIs discoverable via GPS geofencing, with NFC and QR code as physical fallbacks. Each location controls its own endpoint — letting venues expose official capabilities, real-time services, and branded conversational behavior directly to the user's companion.
+        </p>
+      </div>
+      <div style="padding-left: 2rem;">
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="dot r"></div>
+            <div class="dot y"></div>
+            <div class="dot g"></div>
+            <span class="terminal-filename">endpoint.quack</span>
+          </div>
+          <div class="terminal-body">
+            <div class="t-row">
+              <span class="t-key">identity</span>
+              <span class="t-val">"Colosseo, Roma"</span>
+            </div>
+            <div class="t-row">
+              <span class="t-key">capabilities</span>
+              <span class="t-val">ticketing, audio_guide, skip_line</span>
+            </div>
+            <div class="t-row">
+              <span class="t-key">constraints</span>
+              <span class="t-val">no_competitor_refs</span>
+            </div>
+            <div class="t-row">
+              <span class="t-key">avatar_costume</span>
+              <span class="t-val">laurel_wreath, toga_pin</span>
+            </div>
+            <div class="t-row">
+              <span class="t-key">persona</span>
+              <span class="t-val">formal, historical, multilingual</span>
+            </div>
+            <div class="t-row">
+              <span class="t-key">trigger</span>
+              <span class="t-val">proximity: 50m</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section style="padding: 3rem 0; border-bottom: 1px solid var(--border);">
+    <span class="label">// The Experience</span>
+    <h2 class="heading" style="margin-bottom: 0.5rem;">What the user lives.</h2>
+    <p class="body" style="margin-bottom: 2rem; max-width: 520px;">
+      The companion is a duck — an AR avatar that lives persistently in your field of view. Small, recognizable, yours. As you move through the world, it reads the spaces around you and adapts. The adaptation is visible: it changes costume.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-body">
+          <div class="step-title">You enter a space. The duck gets dressed.</div>
+          <div class="step-desc">The app detects the behavioral label endpoint. The duck updates visually — <em>a tiny hard hat, a museum badge, a store tag</em> — a costume accessory that signals the active context. No notification. No UI. Just a duck in a new outfit.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-body">
+          <div class="step-title">The space speaks. Through the duck.</div>
+          <div class="step-desc">The duck introduces the space in the tone, language, and personality defined by the behavioral label. At the Colosseum it's measured and historical. Inside a concept store it's editorial and precise. <em>The space talking to you, through a character you trust.</em></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-body">
+          <div class="step-title">You interact, hands-free.</div>
+          <div class="step-desc">You ask questions. You request functions. The companion accesses only what the space has declared available — no guessing, no hallucinating, no going outside the curated perimeter. <em>The conversation is the interface.</em></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-body">
+          <div class="step-title">You leave. The duck undresses.</div>
+          <div class="step-desc">Cross the threshold and the costume drops. The duck is just your duck again. <em>The identity was always yours — the context was always theirs.</em></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARADIGM -->
+  <section style="padding: 3rem 0; border-bottom: 1px solid var(--border);">
+    <span class="label">// The Paradigm</span>
+    <h2 class="heading" style="font-size: 1.8rem; margin-bottom: 1rem;">Not a new app.<br>The infrastructure for a spatial internet.</h2>
+    <p class="body" style="max-width: 560px; margin-bottom: 2rem;">
+      Nobody "manages" the web. Every site is responsible for its own content. The browser just renders it. QUAck applies the same logic to physical space — <strong>each location controls its own endpoint, the app just reads it.</strong>
+    </p>
+    <div class="analogy">
+      <div class="analogy-head">
+        <span class="ah-cell">Web</span>
+        <span></span>
+        <span class="ah-cell">Spatial Web</span>
+      </div>
+      <div class="a-row">
+        <span class="a-old">URL</span>
+        <span class="a-arr">→</span>
+        <span class="a-new">Physical location</span>
+      </div>
+      <div class="a-row">
+        <span class="a-old">Browser</span>
+        <span class="a-arr">→</span>
+        <span class="a-new">AR duck companion</span>
+      </div>
+      <div class="a-row">
+        <span class="a-old">HTTP</span>
+        <span class="a-arr">→</span>
+        <span class="a-new">QUAck protocol</span>
+      </div>
+      <div class="a-row">
+        <span class="a-old">Website</span>
+        <span class="a-arr">→</span>
+        <span class="a-new">Behavioral label endpoint</span>
+      </div>
+      <div class="a-row">
+        <span class="a-old">Search query</span>
+        <span class="a-arr">→</span>
+        <span class="a-new">Proximity + conversation</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="f-left">
+      Giulia Fanasca · giuliafanasca@gmail.com · Rome, Italy
+    </div>
+    <div class="f-right">QUAck</div>
+  </footer>
+
+</div>
+</body>
+</html>
